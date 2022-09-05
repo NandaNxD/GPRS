@@ -8,6 +8,10 @@ public class Payload {
     byte[] image;
     String description;
 
+    public Payload(){
+
+    }
+
     public Payload(String vin, double latitude, double longitude, byte[] image, String description) {
         this.vin = vin;
         this.latitude = latitude;
