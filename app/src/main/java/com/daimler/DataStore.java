@@ -31,9 +31,9 @@ public class DataStore extends SQLiteOpenHelper {
             return null;
         }
         else {
+            Payload p=new Payload(cu.getString(0),cu.getDouble(1),cu.getDouble(2),cu.getBlob(3),cu.getString(4));
             cu.close();
-
-            return new Payload(cu.getString(0),cu.getDouble(1),cu.getDouble(2),cu.getBlob(3),cu.getString(4));
+            return p;
         }
     }
 
