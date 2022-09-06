@@ -39,6 +39,11 @@ public class DataStore extends SQLiteOpenHelper {
         cv.put(columns[3],payload.image);
         cv.put(columns[4],payload.description);
         String desc=payload.description;
+
+        if(search(payload.vin)!=null){
+            db.update(tableName,cv,"VIN=?",new String[]{payload.vin});
+        }
+        else
         db.insert(tableName,null,cv);
     }
 
