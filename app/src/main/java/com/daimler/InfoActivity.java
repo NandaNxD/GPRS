@@ -50,8 +50,9 @@ public class InfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 db.delete(vin);
                 Toast.makeText(getApplicationContext(),"Vehicle Retrieved",Toast.LENGTH_LONG).show();
-                Intent it=new Intent(InfoActivity.this,SearchActivity.class);
-                startActivity(it);
+//                Intent it=new Intent(InfoActivity.this,SearchActivity.class);
+//                startActivity(it);
+                finish();
             }
         });
 

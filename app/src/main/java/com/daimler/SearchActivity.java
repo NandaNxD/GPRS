@@ -1,7 +1,6 @@
 package com.daimler;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -31,6 +30,7 @@ public class SearchActivity extends AppCompatActivity {
                 Log.d("VIN",vin);
                 Payload payload=db.search(vin);
                 if(payload!=null){
+                    searchEditText.setText("");
                     startActivity(it);
                 }
                 else{
