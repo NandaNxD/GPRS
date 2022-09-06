@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 
 public class DataStore extends SQLiteOpenHelper {
     static String tableName="VEHICLEINFO";
-    static String dbName="DAIMLER";
+    static String dbName="DAIM";
     static String columns[]={"VIN","LATITUDE","LONGITUDE","IMAGEBLOB","DESCRIPTION"};
 
     public DataStore(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
@@ -20,10 +20,12 @@ public class DataStore extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS VEHICLEINFO(VIN TEXT PRIMARY KEY NOT NULL,LATITUDE REAL,LONGITUDE REAL,IMAGEBLOB BLOB,DESCRIPTION TEXT)");
+        db.execSQL("CREATE TABLE VEHICLEINFO(VIN TEXT PRIMARY KEY NOT NULL,LATITUDE REAL,LONGITUDE REAL,IMAGEBLOB BLOB,DESCRIPTION TEXT)");
     }
 
     public void insert(Payload payload){
+        getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS VEHICLEINFO(VIN TEXT PRIMARY KEY NOT NULL,LATITUDE REAL,LONGITUDE REAL,IMAGEBLOB BLOB,DESCRIPTION TEXT)");
+
         ContentValues cv=new ContentValues();
         cv.put(columns[0],payload.vin);
         cv.put(columns[1],payload.latitude);
@@ -39,15 +41,20 @@ public class DataStore extends SQLiteOpenHelper {
         String v=payload.vin;
         //db.update(tableName,cv);
         db.insert(tableName,null,cv);
-
     }
 
     public Payload search(String vin){
+//        getWritableDatabase().execSQL("DROP TABLE IF EXISTS " + tableName);
+//        return null;
         SQLiteDatabase db=getReadableDatabase();
         String query="SELECT * FROM VEHICLEINFO WHERE VIN=\'"+ vin+"\'";
         Log.d("Payload Search",query);
 
         Cursor cu=db.rawQuery(query,null);
+        db.close();
+        if(cu==null){
+            return null;
+        }
         int count=cu.getCount();
         if(cu.getCount()>0){
             cu.moveToFirst();
@@ -62,12 +69,13 @@ public class DataStore extends SQLiteOpenHelper {
     public void delete(String vin){
         SQLiteDatabase db=getWritableDatabase();
         db.execSQL("DELETE FROM VEHICLEINFO WHERE VIN="+"\'"+vin+"\'");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//        db.execSQL("DROP TABLE IF EXISTS " + tableName);
-//        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS " + tableName);
+        onCreate(db);
 
     }
 }

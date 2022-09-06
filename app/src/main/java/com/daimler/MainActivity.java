@@ -1,5 +1,7 @@
 package com.daimler;
 
+import static com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -12,7 +14,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -24,13 +29,20 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity{
 
     private static final int pic_id = 123;
 
@@ -39,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
     DataStore db;
     Payload payload;
     ImageView imageView;
-    private FusedLocationProviderClient fusedLocationClient;
+    FusedLocationProviderClient fusedLocationClient;
+
 
     public void clear(){
         vinEditText.setText("");
@@ -106,25 +119,39 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Fields Empty",Toast.LENGTH_LONG).show();
                     return;
                 }
-                
+                fusedLocationClient.getLastLocation().addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        vinEditText.setText("Error Adding VIN");
+                        return;
+                    }
+                });
+
                 fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        double lat = location.getLatitude();
-                        double lon = location.getLongitude();
-                        Log.d("Latitide", "" + lat);
-                        payload.latitude = lat;
-                        payload.longitude = lon;
-                        payload.vin = vinEditText.getText().toString();
-                        payload.description = descEditText.getText().toString();
-                        Log.d("LCX", "Hello");
+                        if(location!=null){
+                          double   lat = location.getLatitude();
+                          double   lon = location.getLongitude();
+                            Log.d("Latitide", "" + lat);
+                            payload.latitude = lat;
+                            payload.longitude = lon;
+                            payload.image = Util.getBytes(((BitmapDrawable) imageView.getDrawable()).getBitmap());
+                            db.insert(payload);
 
-                        payload.image = Util.getBytes(((BitmapDrawable) imageView.getDrawable()).getBitmap());
-                        Log.d("IMGX", "" + payload.image.length);
-                        db.insert(payload);
+                            Log.d("LCX", "Hello");
+
+                            Log.d("IMGX", "" + payload.image.length);
+
+                        }
+                        else{
+                            Log.d("NULLLOC","NULL");
+                        }
+
                     }
                 });
                 String p=payload.vin;
+
                 Toast.makeText(getApplicationContext(),"VIM ADDED",Toast.LENGTH_LONG).show();
                 clear();
             }
@@ -164,4 +191,54 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    private void getLastLocation(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+
+                            if (location != null){
+                                try {
+                                    Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                                    List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+//                                    lattitude.setText("Lattitude: "+addresses.get(0).getLatitude());
+//                                    longitude.setText("Longitude: "+addresses.get(0).getLongitude());
+//                                    address.setText("Address: "+addresses.get(0).getAddressLine(0));
+//                                    city.setText("City: "+addresses.get(0).getLocality());
+//                                    country.setText("Country: "+addresses.get(0).getCountryName());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                            }
+
+                        }
+                    });
+        }else {
+            askPermission();
+        }
+
+
+    }
+
+    private void askPermission() {
+        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull  String[] permissions, @NonNull  int[] grantResults) {
+        if (requestCode == REQUEST_CODE){
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                getLastLocation();
+
+            }else {
+                Toast.makeText(MainActivity.this, "Please provide the required permission", Toast.LENGTH_SHORT).show();
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 }
