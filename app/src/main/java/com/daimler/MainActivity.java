@@ -17,10 +17,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +57,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // start qr scan
+                IntentIntegrator intentIntegrator = new IntentIntegrator(MainActivity.this);
+                intentIntegrator.setPrompt("Scan a barcode or QR Code");
+                intentIntegrator.setOrientationLocked(false);
+
+                intentIntegrator.initiateScan();
             }
         });
         cameraButton.setOnClickListener(new View.OnClickListener() {
@@ -115,5 +123,21 @@ public class MainActivity extends AppCompatActivity {
             // Set the image in imageview for display
             imageView.setImageBitmap(photo);
         }
+        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        // if the intentResult is null then
+        // toast a message as "cancelled"
+        if (intentResult != null) {
+            if (intentResult.getContents() == null) {
+                Toast.makeText(getBaseContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                // if the intentResult is not null we'll set
+                // the content and format of scan message
+                vinEditText.setText(intentResult.getContents());
+//                messageFormat.setText(intentResult.getFormatName());
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+
     }
 }
