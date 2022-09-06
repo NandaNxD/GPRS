@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "149787595867",
+    "project_id": "gprs-5febc",
+    "storage_bucket": "gprs-5febc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:149787595867:android:6ef659533ef058ab5a9b7e",
+        "android_client_info": {
+          "package_name": "com.daimler"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "149787595867-hgo9aqqa1furmjtvasjf3kacb1r7e1uo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgxCKYftLGyZa-9cOS-lvGmj1qyYLEScE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "149787595867-hgo9aqqa1furmjtvasjf3kacb1r7e1uo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

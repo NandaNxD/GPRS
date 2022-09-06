@@ -1,5 +1,8 @@
 package com.daimler;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,7 +24,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -36,6 +41,11 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     private FusedLocationProviderClient fusedLocationClient;
 
+    public void clear(){
+        vinEditText.setText("");
+        descEditText.setText("");
+        imageView.setVisibility(View.INVISIBLE);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         imageView = findViewById(R.id.imageDisplayMain);
         scanButton = findViewById(R.id.scanQRButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        payload=new Payload();
+        payload = new Payload();
 
         db = new DataStore(this, DataStore.dbName, null, 1);
 
@@ -80,30 +90,43 @@ public class MainActivity extends AppCompatActivity {
                 payload.vin = vinEditText.getText().toString();
                 payload.description = descEditText.getText().toString();
 
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                    },100);
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
                 }
+                // Add Checks
 
+                if(vinEditText.getText().toString().isEmpty() || descEditText.getText().toString().isEmpty() || imageView.getVisibility()==View.INVISIBLE){
+                    Toast.makeText(getApplicationContext(),"Fields Empty",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
                 fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        double lat=location.getLatitude();
-                        double lon=location.getLongitude();
-                        Log.d("Latitide",""+lat);
-                        payload.latitude=lat;
-                        payload.longitude=lon;
+                        double lat = location.getLatitude();
+                        double lon = location.getLongitude();
+                        Log.d("Latitide", "" + lat);
+                        payload.latitude = lat;
+                        payload.longitude = lon;
                         payload.vin = vinEditText.getText().toString();
                         payload.description = descEditText.getText().toString();
-                        Log.d("LCX","Hello") ;
+                        Log.d("LCX", "Hello");
 
-                        payload.image=Util.getBytes(((BitmapDrawable)imageView.getDrawable()).getBitmap());
-                        Log.d("IMGX",""+payload.image.length);
+                        payload.image = Util.getBytes(((BitmapDrawable) imageView.getDrawable()).getBitmap());
+                        Log.d("IMGX", "" + payload.image.length);
                         db.insert(payload);
                     }
                 });
+                String p=payload.vin;
+                Toast.makeText(getApplicationContext(),"VIM ADDED",Toast.LENGTH_LONG).show();
+                clear();
             }
         });
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -120,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == pic_id && resultCode == RESULT_OK) {
             // BitMap is data structure of image file which store the image in memory
             Bitmap photo = (Bitmap) data.getExtras().get("data");
+            imageView.setVisibility(View.VISIBLE);
             // Set the image in imageview for display
             imageView.setImageBitmap(photo);
         }

@@ -35,20 +35,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="Enter VIN"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.44"
+        app:layout_constraintEnd_toStartOf="@+id/scanQRButton"
+        app:layout_constraintHorizontal_bias="0.61"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.129" />
+        app:layout_constraintVertical_bias="0.126" />
 
     <EditText
         android:id="@+id/descriptionEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="Enter Description"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -81,6 +81,7 @@
         app:layout_constraintVertical_bias="0.269" />
 
     <ImageView
+        android:visibility="invisible"
         android:id="@+id/imageDisplayMain"
         android:layout_width="204dp"
         android:layout_height="176dp"
