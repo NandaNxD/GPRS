@@ -15,7 +15,7 @@ public class DataStore extends SQLiteOpenHelper {
     static String columns[]={"VIN","LATITUDE","LONGITUDE","IMAGEBLOB","DESCRIPTION"};
 
     public DataStore(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, dbName, factory, version);
+        super(context, name, factory, version);
     }
 
     @Override
@@ -24,7 +24,8 @@ public class DataStore extends SQLiteOpenHelper {
     }
 
     public void insert(Payload payload){
-        getWritableDatabase().execSQL("CREATE TABLE IF NOT EXISTS VEHICLEINFO(VIN TEXT PRIMARY KEY NOT NULL,LATITUDE REAL,LONGITUDE REAL,IMAGEBLOB BLOB,DESCRIPTION TEXT)");
+        SQLiteDatabase db=getWritableDatabase();
+        //db.execSQL("CREATE TABLE IF NOT EXISTS VEHICLEINFO(VIN TEXT PRIMARY KEY NOT NULL,LATITUDE REAL,LONGITUDE REAL,IMAGEBLOB BLOB,DESCRIPTION TEXT)");
 
         ContentValues cv=new ContentValues();
         cv.put(columns[0],payload.vin);
@@ -37,9 +38,7 @@ public class DataStore extends SQLiteOpenHelper {
         }
         cv.put(columns[3],payload.image);
         cv.put(columns[4],payload.description);
-        SQLiteDatabase db=getWritableDatabase();
-        String v=payload.vin;
-        //db.update(tableName,cv);
+        String desc=payload.description;
         db.insert(tableName,null,cv);
     }
 
@@ -74,8 +73,8 @@ public class DataStore extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + tableName);
-        onCreate(db);
+//        db.execSQL("DROP TABLE IF EXISTS " + tableName);
+//        onCreate(db);
 
     }
 }

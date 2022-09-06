@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         vinEditText.setText("Error Adding VIN");
-                        return;
                     }
                 });
 
@@ -191,54 +190,6 @@ public class MainActivity extends AppCompatActivity{
         }
 
     }
-    private void getLastLocation(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
 
-                            if (location != null){
-                                try {
-                                    Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
-                                    List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-//                                    lattitude.setText("Lattitude: "+addresses.get(0).getLatitude());
-//                                    longitude.setText("Longitude: "+addresses.get(0).getLongitude());
-//                                    address.setText("Address: "+addresses.get(0).getAddressLine(0));
-//                                    city.setText("City: "+addresses.get(0).getLocality());
-//                                    country.setText("Country: "+addresses.get(0).getCountryName());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-
-                            }
-
-                        }
-                    });
-        }else {
-            askPermission();
-        }
-
-
-    }
-
-    private void askPermission() {
-        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},REQUEST_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull  String[] permissions, @NonNull  int[] grantResults) {
-        if (requestCode == REQUEST_CODE){
-
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                getLastLocation();
-
-            }else {
-                Toast.makeText(MainActivity.this, "Please provide the required permission", Toast.LENGTH_SHORT).show();
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
 }

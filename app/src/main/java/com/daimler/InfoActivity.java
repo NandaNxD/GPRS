@@ -52,6 +52,7 @@ public class InfoActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Vehicle Retrieved",Toast.LENGTH_LONG).show();
                 Intent it=new Intent(InfoActivity.this,SearchActivity.class);
                 startActivity(it);
+                finish();
             }
         });
 
