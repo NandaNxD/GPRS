@@ -51,7 +51,7 @@ public class DataStore extends SQLiteOpenHelper {
         Log.d("Payload Search",query);
 
         Cursor cu=db.rawQuery(query,null);
-        db.close();
+        //db.close();
         if(cu==null){
             return null;
         }
